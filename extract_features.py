@@ -29,13 +29,18 @@ for split in (config.TRAIN, config.TEST):
         # randomly shuffle the image paths and then extract the class
         # labels from the file paths
         random.shuffle(imagePaths)
+
         labels = [p.split(os.path.sep)[-2] for p in imagePaths]
 
         # if the label encoder is None, create it
         if le is None:
             le = LabelEncoder()
             le.fit(labels)
-
+        
+        pathPath = 'img_output/imgs.txt'
+        with open(pathPath, 'w') as f:
+            for item in imagePaths:
+                f.write("%s\n" % item)
         # open the output CSV file for writing
         csvPath = os.path.sep.join([config.BASE_CSV_PATH,
             "{}.csv".format(split)])

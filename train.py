@@ -2,6 +2,7 @@
 # python train.py
 
 # import the necessary packages
+from keras.models import Sequential
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report
 from pyimagesearch import config
@@ -48,17 +49,29 @@ print("[INFO] loading data...")
 # load the label encoder from disk
 le = pickle.loads(open(config.LE_PATH, "rb").read())
 
+
 # train the model
 print("[INFO] training model...")
-model = LogisticRegression(solver="lbfgs", multi_class="auto",max_iter = 10000)
-model.fit(trainX, trainY)
+model = LogisticRegression(solver="lbfgs", multi_class="multinomial",max_iter = 10000)
+p = model.fit(trainX, trainY)
 
 # evaluate the model
 print("[INFO] evaluating...")
 preds = model.predict(testX)
-incorrects = np.nonzero(model.predict_class(testX).reshape((-1,)) != testY)
+incorrects = []
+for i in range(0, len(preds)):
+    if testY[i] != preds[i]:
+        incorrects.append(i);
+
+
+f = open('img_output/imgs.txt', 'r')
+x = f.readlines()
+f.close()
+for i in incorrects:
+    string = x[i] + "\tExpected: " + str(testY[i]) + "\tPredicted: " + str(preds[i])
+    print(string);
+
 print(classification_report(testY, preds, target_names=le.classes_))
-print(incorrects)
 
 # serialize the model to disk
 print("[INFO] saving model...")
